@@ -41,10 +41,8 @@ matrices = {
 }
 
 
-def load_filters(): # FIX !!!!
-    #with open('filters.toml', 'rb') as file:
-    #    filters = tomllib.load(file)
-    filters = {
+def load_filters():
+    default_filters = {
         "Orange": ((252, 176, 32), (10, 6, 3)),
         "Capuccino": ((200, 185, 150), (61, 49, 40)),
         "Brat": ((137, 205, 0), (0, 0, 0)),
@@ -54,10 +52,22 @@ def load_filters(): # FIX !!!!
         "Cyan": ((0, 204, 255), (0, 34, 43)),
         "Vapor": ((250, 185, 253), (75, 123, 222)),
         "Matrix": ((0, 255, 0), (0, 39, 6)),
-        "Obra Dinn": ((229, 255, 254), (51, 51, 25))
+        "ObraDinn": ((229, 255, 254), (51, 51, 25))
     }
 
-    return filters
+    try:
+        with open('filters.toml', 'rb') as file:
+            filters = tomllib.load(file)
+        return filters
+    
+    except FileNotFoundError:
+        print("[FileNotFoundError] The 'filters.toml' file was not found. Using default filter pack...")
+        return default_filters
+    
+    except tomllib.TOMLDecodeError as e:
+        print(f"[TOMLDecodeError] Error parsing the TOML file: {e}\n Using default filter pack...")
+        return default_filters
+    
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -137,14 +147,12 @@ def process_frame(frame_array, contrast, sharpness, downscale_pot, bayer_matrix,
     return np.array(dithered_image)
 
 def process_clip(index, all_processed_frames, frames, contrast, sharpness, downscale_pot, chosen_filter, bayer_matrix):
-    print(f"Process {index}, frames: {len(frames)}")
     processed_frames = []
     for frame in frames:
         processed_frame = process_frame(frame, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter)
         processed_frames.append(processed_frame)
 
     all_processed_frames[index] = processed_frames
-    print(f"Process {index} finished")
 
 def is_image(file_path):
     try:
