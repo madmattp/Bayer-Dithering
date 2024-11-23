@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageSequence
 import time
 from multiprocessing import Process, Manager
 from moviepy.editor import VideoFileClip, ImageSequenceClip
@@ -166,23 +166,19 @@ def is_image(file_path):
         return False
 
 def image_processing(image, contrast, sharpness, downscale_factor, matrix, chosen_filter, output):
-    try:
-        with Image.open(args.input) as image:
-            enhancer = ImageEnhance.Contrast(image)
-            image = enhancer.enhance(factor=contrast)
-            sharp_image = sharpen(image=image, factor=sharpness)
-            downscaled_image = downscale(image=sharp_image, pot=downscale_factor)
-            dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=matrix)
+    with Image.open(args.input) as image:
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(factor=contrast)
+        sharp_image = sharpen(image=image, factor=sharpness)
+        downscaled_image = downscale(image=sharp_image, pot=downscale_factor)
+        dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=matrix)
 
-            if chosen_filter is not None:
-                dithered_image = colored_filter(image=dithered_image, colors=chosen_filter)
+        if chosen_filter is not None:
+            dithered_image = colored_filter(image=dithered_image, colors=chosen_filter)
 
-            output_file = output if output is not None else "dithered_image.png"
-            dithered_image.save(output_file)
+        output_file = output if output is not None else "dithered_image.png"
+        dithered_image.save(output_file)
 
-    except FileNotFoundError as e:
-        print(f"[ FileNotFoundError ] Input file not found!\nDetails: {e}")
-        sys.exit(1)
 
 def is_gif(file_path):
     try:
@@ -275,6 +271,10 @@ if __name__ == "__main__":
         valid_keys = ', '.join(matrices.keys())
         print(f"[ KeyError ] The matrix '{args.matrix}' was not found.")
         print(f"Valid options are: {valid_keys}")
+        sys.exit(1)
+
+    except FileNotFoundError:
+        print(f"[ FileNotFoundError ] Input file {args.input} not found!")
         sys.exit(1)
 
     end_time = time.time() 
