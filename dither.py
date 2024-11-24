@@ -117,20 +117,21 @@ def bayer_dithering(image, bayer_matrix):
 
 def colored_filter(image, colors=None):
     image = image.convert("RGB")
-    if colors == None:
+    if colors is None:
         return image
     
-    light = colors[0]
-    dark = colors[1]
+    light = tuple(colors[0])
+    dark = tuple(colors[1])
 
-    height, width = image.size
+    width, height = image.size
 
     for y in range(height):
         for x in range(width):
-            if image.getpixel((y, x)) == (255, 255, 255):
-                image.putpixel((y, x), light)
+            pixel = image.getpixel((x, y))
+            if pixel == (255, 255, 255):
+                image.putpixel((x, y), light)
             else:
-                image.putpixel((y, x), dark)
+                image.putpixel((x, y), dark)
 
     return image
 
@@ -165,7 +166,7 @@ def is_image(file_path):
     except (IOError, SyntaxError):
         return False
 
-def image_processing(image, contrast, sharpness, downscale_factor, matrix, chosen_filter, output):
+def image_processing(image, contrast: float, sharpness: float, downscale_factor: int, matrix, chosen_filter: list = None, output: str = None):
     with Image.open(args.input) as image:
         enhancer = ImageEnhance.Contrast(image)
         image = enhancer.enhance(factor=contrast)
@@ -178,7 +179,6 @@ def image_processing(image, contrast, sharpness, downscale_factor, matrix, chose
 
         output_file = output if output is not None else "dithered_image.png"
         dithered_image.save(output_file)
-
 
 def is_gif(file_path):
     try:
@@ -200,7 +200,7 @@ def is_video(file_path):
     finally:
         video.release()
 
-def video_processing(video_path, threads, contrast, sharpness, downscale_factor, matrix, chosen_filter, output):
+def video_processing(video_path, as_gif, threads, contrast, sharpness, downscale_factor, matrix, chosen_filter, output):
     video = VideoFileClip(video_path)
     audio_clip = video.audio
     fps = video.fps
@@ -230,8 +230,12 @@ def video_processing(video_path, threads, contrast, sharpness, downscale_factor,
     final_clip = ImageSequenceClip(all_processed_frames, fps=fps)
     final_clip = final_clip.set_audio(audio_clip)
 
-    output_file = output if output is not None else "dithered_video.mp4"
-    final_clip.write_videofile(output_file, codec="libx264")
+    if as_gif:
+        output_file = output if output is not None else "dithered_gif.gif"
+        final_clip.write_gif(output_file, fps=fps, loop=0)
+    else:
+        output_file = output if output is not None else "dithered_video.mp4"
+        final_clip.write_videofile(output_file, codec="libx264")
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -239,7 +243,7 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     filters = load_filters()
-    filter = filters[args.filter] if args.filter is not None else None
+    filter_chosen = filters[args.filter] if args.filter is not None else None
 
     try:
         bayer_matrix = matrices[args.matrix]
@@ -249,16 +253,27 @@ if __name__ == "__main__":
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
                             matrix=bayer_matrix,
-                            chosen_filter=filter,
+                            chosen_filter=filter_chosen,
                             output=args.output)
-        elif is_video(file_path=args.input):
+        if is_gif(file_path=args.input):
             video_processing(video_path=args.input,
+                            as_gif=True,
                             threads=args.threads,
                             contrast=args.contrast,
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
                             matrix=bayer_matrix,
-                            chosen_filter=filter,
+                            chosen_filter=filter_chosen,
+                            output=args.output)
+        elif is_video(file_path=args.input):
+            video_processing(video_path=args.input,
+                            as_gif=False,
+                            threads=args.threads,
+                            contrast=args.contrast,
+                            sharpness=args.sharpness,
+                            downscale_factor=args.downscale,
+                            matrix=bayer_matrix,
+                            chosen_filter=filter_chosen,
                             output=args.output)
         else:
             raise ValueError
