@@ -3,20 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário</title>
+    <title>Parâmetros de Dithering</title>
 </head>
 <body>
+    <h1>Configurações de Dithering</h1>
     <form method="POST" enctype="multipart/form-data">
-        <label for="text_input">Digite algo:</label>
-        <input type="text" id="text_input" name="text_input"><br><br>
+        <!-- Seleção de arquivo -->
+        <label for="input">Selecione um arquivo:</label>
+        <input type="file" id="input" name="input"><br><br>
 
-        <label for="checkbox">Marcar checkbox:</label>
-        <input type="checkbox" id="checkbox" name="checkbox"><br><br>
+        <!-- Seleção de matriz de Bayer -->
+        <label for="matrix">Selecione uma Matriz de Bayer:</label>
+        <select id="matrix" name="matrix">
+            <option value="matriz1">Matriz 1</option>
+            <option value="matriz2">Matriz 2</option>
+            <option value="matriz3">Matriz 3</option>
+        </select><br><br>
 
-        <label for="file_input">Selecione um arquivo:</label>
-        <input type="file" id="file_input" name="file_input"><br><br>
+        <!-- Seleção de filtro -->
+        <label for="filter">Selecione um Filtro:</label>
+        <select id="filter" name="filter">
+            <option value="filtro1">Filtro 1</option>
+            <option value="filtro2">Filtro 2</option>
+            <option value="filtro3">Filtro 3</option>
+        </select><br><br>
 
-        <button type="submit">Avançar</button>
+        <!-- Sharpness (0 até 2) -->
+        <label for="sharpness">Sharpness (0 até 2):</label>
+        <input type="number" id="sharpness" name="sharpness" min="0" max="2" step="0.1" value="1"><br><br>
+
+        <!-- Contrast (0 até 2) -->
+        <label for="contrast">Contrast (0 até 2):</label>
+        <input type="number" id="contrast" name="contrast" min="0" max="2" step="0.1" value="1"><br><br>
+
+        <!-- Downscale (digite um número) -->
+        <label for="downscale">Downscale:</label>
+        <input type="number" id="downscale" name="downscale" step="1" min="1" value="1"><br><br>
+
+        <!-- Threads (1 até os.cpu_count()) -->
+        <label for="threads">Quantidade de Threads (1 até {{ max_threads }}):</label>
+        <input type="number" id="threads" name="threads" min="1" max="{{ max_threads }}" value="1"><br><br>
+
+        <!-- Botão de submit -->
+        <button type="submit">Aplicar Efeito</button>
     </form>
 </body>
 </html>
+
