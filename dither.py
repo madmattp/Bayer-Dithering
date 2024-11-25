@@ -4,7 +4,6 @@ import time
 from multiprocessing import Process, Manager
 from moviepy.editor import VideoFileClip, ImageSequenceClip
 import numpy as np
-import os
 import argparse
 import tomllib
 import sys
@@ -88,18 +87,18 @@ def parse_arguments():
     return args
 
 
-def sharpen(image, factor):
+def sharpen(image: Image, factor: float):
     enhancer = ImageEnhance.Sharpness(image)
     sharp_image = enhancer.enhance(factor)
     return sharp_image
 
-def downscale(image, pot):
+def downscale(image: Image, pot: int):
     width = image.width // pot
     height = image.height // pot
     downscaled_image = image.resize((width, height), Image.Resampling.NEAREST)
     return downscaled_image
 
-def bayer_dithering(image, bayer_matrix):
+def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
     grayscale_image = image.convert('L')
 
     img_array = np.array(grayscale_image, dtype=np.float32) / 255.0
@@ -117,7 +116,7 @@ def bayer_dithering(image, bayer_matrix):
     dithered_image = Image.fromarray((img_array * 255).astype(np.uint8))
     return dithered_image
 
-def colored_filter(image, colors=None):
+def colored_filter(image: Image, colors: list = None):
     image = image.convert("RGB")
     if colors is None:
         return image
@@ -136,26 +135,6 @@ def colored_filter(image, colors=None):
                 image.putpixel((x, y), dark)
 
     return image
-
-def process_frame(frame_array, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter):
-    image = Image.fromarray(frame_array)
-
-    enhancer = ImageEnhance.Contrast(image)
-    image = enhancer.enhance(contrast)
-    sharp_image = sharpen(image=image, factor=sharpness)
-    downscaled_image = downscale(image=sharp_image, pot=downscale_pot)
-    dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=bayer_matrix)
-    dithered_image = colored_filter(dithered_image, chosen_filter)
-
-    return np.array(dithered_image)
-
-def process_clip(index, all_processed_frames, frames, contrast, sharpness, downscale_pot, chosen_filter, bayer_matrix):
-    processed_frames = []
-    for frame in frames:
-        processed_frame = process_frame(frame, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter)
-        processed_frames.append(processed_frame)
-
-    all_processed_frames[index] = processed_frames
 
 def is_image(file_path: Path):
     try:
@@ -191,23 +170,23 @@ def is_gif(file_path: Path):
         return False
     
 def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
-    gif = Image.open(input_gif)
-    durations = gif.info['duration']
-    frames = []
+    with Image.open(input_gif) as gif:
+        durations = gif.info['duration']
+        frames = []
 
-    for frame in ImageSequence.Iterator(gif):
-        frame = frame.convert("RGB")
-        enhancer = ImageEnhance.Contrast(frame)
-        frame = enhancer.enhance(contrast)
+        for frame in ImageSequence.Iterator(gif):
+            frame = frame.convert("RGB")
+            enhancer = ImageEnhance.Contrast(frame)
+            frame = enhancer.enhance(contrast)
 
-        sharp_image = sharpen(image=frame, factor=sharpness)
-        downscaled_image = downscale(image=sharp_image, pot=downscale_factor)
-        dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=matrix)
+            sharp_image = sharpen(image=frame, factor=sharpness)
+            downscaled_image = downscale(image=sharp_image, pot=downscale_factor)
+            dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=matrix)
 
-        if chosen_filter:
-            dithered_image = colored_filter(dithered_image, chosen_filter)
-        
-        frames.append(dithered_image)
+            if chosen_filter:
+                dithered_image = colored_filter(dithered_image, chosen_filter)
+            
+            frames.append(dithered_image)
 
     # Cria um buffer em memória
     gif_buffer = BytesIO()
@@ -227,7 +206,27 @@ def is_video(file_path: Path):
     finally:
         video.release()
 
-def video_processing(video_path, threads, contrast, sharpness, downscale_factor, matrix, chosen_filter):
+def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
+    def process_frame(frame_array, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter):
+        image = Image.fromarray(frame_array)
+
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(contrast)
+        sharp_image = sharpen(image=image, factor=sharpness)
+        downscaled_image = downscale(image=sharp_image, pot=downscale_pot)
+        dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=bayer_matrix)
+        dithered_image = colored_filter(dithered_image, chosen_filter)
+
+        return np.array(dithered_image)
+
+    def process_clip(index, all_processed_frames, frames, contrast, sharpness, downscale_pot, chosen_filter, bayer_matrix):
+        processed_frames = []
+        for frame in frames:
+            processed_frame = process_frame(frame, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter)
+            processed_frames.append(processed_frame)
+
+        all_processed_frames[index] = processed_frames
+
     video = VideoFileClip(video_path)
     audio_clip = video.audio
     fps = video.fps
