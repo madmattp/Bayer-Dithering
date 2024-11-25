@@ -147,8 +147,8 @@ def is_image(file_path: Path):
     except (IOError, SyntaxError):
         return False
 
-def image_processing(image: Path, contrast: float, sharpness: float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
-    with Image.open(args.input) as image:
+def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
+    with Image.open(image_path) as image:
         enhancer = ImageEnhance.Contrast(image)
         image = enhancer.enhance(factor=contrast)
         sharp_image = sharpen(image=image, factor=sharpness)
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     try:
         bayer_matrix = matrices[args.matrix]
         if is_image(file_path=args.input):
-            dithered_image = image_processing(image=args.input,
+            dithered_image = image_processing(image_path=args.input,
                             contrast=args.contrast,
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
