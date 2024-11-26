@@ -118,5 +118,8 @@ def display_video():
     video_path = request.args.get('video_path', None)
     return render_template('display_video.html', video_path=video_path)
 
+def run_app():
+    app.run(debug=True)
+
 if __name__ == '__main__':
     app.run(debug=True)
