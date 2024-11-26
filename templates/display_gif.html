@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dithered GIF</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 90vh; /* Ajusta o tamanho máximo da imagem */
+        }
+    </style>
+</head>
+<body>
+    <div allign="center">
+        <img src="{{ url_for('static', filename=gif_path) }}" alt="Dithered GIF">
+    </div>
+</body>
+</html>
