@@ -10,6 +10,7 @@ import sys
 import cv2
 from pathlib import Path
 from io import BytesIO
+import dither_web
 
 # PRECOMPUTED BAYER's MATRICES
 bayer_matrix_2x2 = np.array([
@@ -74,7 +75,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.description = "Applies a Bayer matrix dithering effect to images or videos."
 
-    parser.add_argument('-i', '--input', metavar='PATH', required=True, help='Specifies the input file (image or video) to apply the dithering effect.')
+    parser.add_argument('-i', '--input', metavar='PATH', help='Specifies the input file (image or video) to apply the dithering effect.')
     parser.add_argument('-m', '--matrix', metavar='MATRIX', default='4x4', choices=list(matrices.keys()), help='Selects the Bayer matrix size to use for dithering. Options: 2x2, 4x4, 8x8. Default is 4x4.')
     parser.add_argument('-o', '--output', metavar='PATH', default=None, help='Specifies the output file path. If not set, a default name will be used.')
     parser.add_argument('-f', '--filter', metavar='FILTER', default=None, choices=list(load_filters().keys()), help='Applies a color filter to the output image.')
@@ -82,6 +83,7 @@ def parse_arguments():
     parser.add_argument('-c', '--contrast', metavar='FACTOR', type=float, default=1, help='Adjusts the contrast of the image. Default is 1.')
     parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=1, help='Downscales the image by the given factor before applying the dithering. Default is 1.')
     parser.add_argument('-t', '--threads', metavar='AMOUNT', type=int, default=1, help='Specifies the number of threads to use for parallel processing. Default is 1.')
+    parser.add_argument('-w', '--webui', action='store_true', help='Opens Web UI on port 5000.')
 
     args = parser.parse_args()
     return args
@@ -262,6 +264,10 @@ if __name__ == "__main__":
     start_time = time.time()
 
     args = parse_arguments()
+
+    if args.webui:
+        dither_web.run_app()
+        sys.exit(0)
 
     filters = load_filters()
     filter_chosen = filters[args.filter] if args.filter is not None else None
