@@ -7,25 +7,25 @@
 </head>
 <body>
     <h1>Configurações de Dithering</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <!-- Seleção de arquivo -->
+    <form action="/upload" method="POST" enctype="multipart/form-data">
         <label for="input">Selecione um arquivo:</label>
-        <input type="file" id="input" name="input"><br><br>
+        <input type="file" id="input" name="input" required><br><br>
 
         <!-- Seleção de matriz de Bayer -->
-        <label for="matrix">Selecione uma Matriz de Bayer:</label>
+        <label for="matrix">Selecione uma matriz de Bayer:</label>
         <select id="matrix" name="matrix">
-            <option value="matriz1">Matriz 1</option>
-            <option value="matriz2">Matriz 2</option>
-            <option value="matriz3">Matriz 3</option>
+            {% for key in matrices %}
+            <option value="{{ key }}">{{ key }}</option>
+            {% endfor %}
         </select><br><br>
 
         <!-- Seleção de filtro -->
         <label for="filter">Selecione um Filtro:</label>
         <select id="filter" name="filter">
-            <option value="filtro1">Filtro 1</option>
-            <option value="filtro2">Filtro 2</option>
-            <option value="filtro3">Filtro 3</option>
+            <option value="Tux">Tux</option>
+            {% for key in  filters %}
+            <option value="{{ key }}">{{ key }}</option>
+            {% endfor %}
         </select><br><br>
 
         <!-- Sharpness (0 até 2) -->
