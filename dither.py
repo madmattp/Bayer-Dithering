@@ -10,7 +10,6 @@ import sys
 import cv2
 from pathlib import Path
 from io import BytesIO
-import dither_web
 
 # PRECOMPUTED BAYER's MATRICES
 bayer_matrix_2x2 = np.array([
@@ -82,8 +81,7 @@ def parse_arguments():
     parser.add_argument('-s', '--sharpness', metavar='FACTOR', type=float, default=1, help="Adjusts the sharpness of the image. Default is 1.")
     parser.add_argument('-c', '--contrast', metavar='FACTOR', type=float, default=1, help='Adjusts the contrast of the image. Default is 1.')
     parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=1, help='Downscales the image by the given factor before applying the dithering. Default is 1.')
-    parser.add_argument('-t', '--threads', metavar='AMOUNT', type=int, default=1, help='Specifies the number of threads to use for parallel processing. Default is 1.')
-    parser.add_argument('-w', '--webui', action='store_true', help='Opens Web UI on port 5000.')
+    parser.add_argument('-t', '--threads', metavar='INTEGER', type=int, default=1, help='Specifies the number of threads to use for parallel processing. Default is 1.')
 
     args = parser.parse_args()
     return args
@@ -265,10 +263,6 @@ if __name__ == "__main__":
 
     args = parse_arguments()
 
-    if args.webui:
-        dither_web.run_app()
-        sys.exit(0)
-
     filters = load_filters()
     filter_chosen = filters[args.filter] if args.filter is not None else None
 
@@ -324,4 +318,4 @@ if __name__ == "__main__":
 
     end_time = time.time() 
     execution_time = end_time - start_time  
-    print(f"Tempo de execução: {execution_time:.4f} segundos")
+    print(f"Processing time: {execution_time:.4f} seconds")
