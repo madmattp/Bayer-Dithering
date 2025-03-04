@@ -17,14 +17,14 @@ from io import BytesIO
 bayer_matrix_2x2 = np.array([
     [0, 2],
     [3, 1]
-]) / 3.0
+]) / 4.0
 
 bayer_matrix_4x4 = np.array([
     [0, 8, 2, 10],
     [12, 4, 14, 6],
     [3, 11, 1, 9],
     [15, 7, 13, 5]
-]) / 15.0
+]) / 16.0
 
 bayer_matrix_8x8 = np.array([
     [0, 32, 8, 40, 2, 34, 10, 42],
@@ -35,7 +35,7 @@ bayer_matrix_8x8 = np.array([
     [51, 19, 59, 27, 49, 17, 57, 25],
     [15, 47, 7, 39, 13, 45, 5, 37],
     [63, 31, 55, 23, 61, 29, 53, 21]
-]) / 63.0
+]) / 64.0
 
 matrices = {
     '2x2': bayer_matrix_2x2,
@@ -190,7 +190,6 @@ def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale
             
             frames.append(dithered_image)
 
-    # Cria um buffer em memória
     gif_buffer = BytesIO()
     frames[0].save(gif_buffer, format="GIF", save_all=True, append_images=frames[1:], loop=0, duration=durations, transparency=1)
     gif_buffer.seek(0)
