@@ -16,13 +16,13 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 
 ## Installation
 1. Clone the repository:
-```
-git clone https://github.com/madmattp/Bayer-Dithering.git
-```
+  ```
+  git clone https://github.com/madmattp/Bayer-Dithering.git
+  ```
 2. Install dependencies:
-```
-pip install -r requirements.txt
-```
+  ```
+  pip install -r requirements.txt
+  ```
 
 ## Usage:
 ### Command Line Options:
@@ -44,18 +44,18 @@ For more visually pleasing results before applying dithering, it is recommended 
 
 ### Examples:
 1. Dithering an Image with Recommended Settings:
-```
-python dither.py -i input_image.png -o output_image.png -m 4x4 -c 1.5 -s 1.6 -d 2
-```
+  ```
+  python dither.py -i input_image.png -o output_image.png -m 4x4 -c 1.5 -s 1.6 -d 2
+  ```
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2f4092bf-98b6-44d5-91af-441000b3979f" alt="Silly Cat" width="45%">
   <img src="https://github.com/user-attachments/assets/c521928f-865f-4c70-9953-26b122691cea" alt="Dithered Image" width="45%">
 </p>
 
 2. Dithering a Video with Multiple Threads:
-```
-python dither.py -i input_video.mp4 -o output_video.mp4 -m 4x4 -t 4 -c 1.5 -s 1.6 -d 2
-```
+  ```
+  python dither.py -i input_video.mp4 -o output_video.mp4 -m 4x4 -t 4 -c 1.5 -s 1.6 -d 2
+  ```
 <p align="center">
   <video src="https://github.com/user-attachments/assets/1d1abe14-625d-4bd7-87e6-00cb6b14da05" width="45%" controls></video>
   <video src="https://github.com/user-attachments/assets/de229bbc-6cb2-43fb-a9d8-5c4cda07f06e" width="45%" controls></video>
