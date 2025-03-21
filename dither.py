@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import numpy as np
 from PIL import Image, ImageEnhance, ImageSequence
 import time
 from multiprocessing import Process, Manager
