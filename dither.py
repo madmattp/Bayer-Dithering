@@ -75,7 +75,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.description = "Applies a Bayer matrix dithering effect to images or videos."
 
-    parser.add_argument('-i', '--input', metavar='PATH', help='Specifies the input file (image or video) to apply the dithering effect.')
+    parser.add_argument('-i', '--input', metavar='PATH', required=True, help='Specifies the input file (image or video) to apply the dithering effect.')
     parser.add_argument('-m', '--matrix', metavar='MATRIX', default='4x4', choices=list(matrices.keys()), help='Selects the Bayer matrix size to use for dithering. Options: 2x2, 4x4, 8x8. Default is 4x4.')
     parser.add_argument('-o', '--output', metavar='PATH', default=None, help='Specifies the output file path. If not set, a default name will be used.')
     parser.add_argument('-f', '--filter', metavar='FILTER', default=None, choices=list(load_filters().keys()), help='Applies a color filter to the output image.')
