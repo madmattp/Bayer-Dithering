@@ -184,7 +184,7 @@ def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale
             downscaled_image = downscale(image=sharp_image, pot=downscale_factor)
             dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=matrix)
 
-            if chosen_filter:
+            if chosen_filter is not None:
                 dithered_image = colored_filter(dithered_image, chosen_filter)
             
             frames.append(dithered_image)
@@ -231,13 +231,12 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
     audio_clip = video.audio
     fps = video.fps
 
-    num_cpus = threads
-    duration_per_process = video.duration / num_cpus
+    duration_per_process = video.duration / threads
     manager = Manager()
     all_processed_frames = manager.dict()
     procs = []
 
-    for i in range(num_cpus):
+    for i in range(threads):
         start = i * duration_per_process
         end = min((i + 1) * duration_per_process, video.duration)
         
@@ -302,7 +301,7 @@ if __name__ == "__main__":
         else:
             raise ValueError
 
-    except ValueError as e:
+    except ValueError:
         print(f"[ ValueError ] Input file does not have a valid format!")
         sys.exit(1)
 
