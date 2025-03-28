@@ -72,17 +72,18 @@ def load_filters():
     
 
 def parse_arguments():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.description = "Applies a Bayer matrix dithering effect to images or videos."
 
-    parser.add_argument('-i', '--input', metavar='PATH', required=True, help='Specifies the input file (image or video) to apply the dithering effect.')
-    parser.add_argument('-m', '--matrix', metavar='MATRIX', default='4x4', choices=list(matrices.keys()), help='Selects the Bayer matrix size to use for dithering. Options: 2x2, 4x4, 8x8. Default is 4x4.')
-    parser.add_argument('-o', '--output', metavar='PATH', default=None, help='Specifies the output file path. If not set, a default name will be used.')
-    parser.add_argument('-f', '--filter', metavar='FILTER', default=None, choices=list(load_filters().keys()), help='Applies a color filter to the output image.')
-    parser.add_argument('-s', '--sharpness', metavar='FACTOR', type=float, default=1, help="Adjusts the sharpness of the image. Default is 1.")
-    parser.add_argument('-c', '--contrast', metavar='FACTOR', type=float, default=1, help='Adjusts the contrast of the image. Default is 1.')
-    parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=1, help='Downscales the image by the given factor before applying the dithering. Default is 1.')
-    parser.add_argument('-t', '--threads', metavar='INTEGER', type=int, default=1, help='Specifies the number of threads to use for parallel processing. Default is 1.')
+    
+    parser.add_argument('-i', '--input', metavar='PATH', required=True, help='specifies the input file (image or video) to apply the dithering effect.')
+    parser.add_argument('-m', '--matrix', metavar='MATRIX', default='4x4', choices=list(matrices.keys()), help='selects the Bayer matrix size to use for dithering. options: 2x2, 4x4, 8x8.')
+    parser.add_argument('-o', '--output', metavar='PATH', default=None, help='specifies the output file path. If not set, a default name will be used.')
+    parser.add_argument('-f', '--filter', metavar='FILTER', default=None, choices=list(load_filters().keys()), help='applies a color filter to the output image.')
+    parser.add_argument('-s', '--sharpness', metavar='FACTOR', type=float, default=1, help="adjusts the sharpness of the image.")
+    parser.add_argument('-c', '--contrast', metavar='FACTOR', type=float, default=1, help='adjusts the contrast of the image.')
+    parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=1, help='downscales the image by the given factor before applying the dithering.')
+    parser.add_argument('-t', '--threads', metavar='INTEGER', type=int, default=1, help='specifies the number of threads to use for parallel processing.')
 
     args = parser.parse_args()
     return args
