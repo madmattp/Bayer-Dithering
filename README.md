@@ -30,9 +30,9 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 - ```-m, --matrix```: Selects the Bayer matrix size. Options: 2x2, 4x4, 8x8 (default: 4x4).
 - ```-o, --output```: Specifies the output file path. A default name will be used if not provided.
 - ```-f, --filter```: Applies a color filter to the output image.
-- ```-s, --sharpness```: Adjusts the sharpness (default: 1).
-- ```-c, --contrast```: Adjusts the contrast (default: 1).
-- ```-d, --downscale```: Downscales the image by a factor before dithering (default: 1).
+- ```-s, --sharpness```: Adjusts the sharpness (default: 1.6).
+- ```-c, --contrast```: Adjusts the contrast (default: 1.5).
+- ```-d, --downscale```: Downscales the image by a factor before dithering (default: 2).
 - ```-t, --threads```: Specifies the number of threads for processing (default: 1).
 
 ### Recommended Settings
