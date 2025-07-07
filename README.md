@@ -35,6 +35,8 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 - ```-d, --downscale```: Downscales the image by a factor before dithering (default: 2).
 - ```-t, --threads```: Specifies the number of threads for processing (default: 1).
 
+⚠️ Note: When processing videos, the output format must be .avi to ensure compatibility with the rawvideo codec used for lossless output. Other formats (e.g., .mp4) may fail to play correctly in common players due to unsupported encoding profiles.
+
 ### Recommended Settings
 For more visually pleasing results before applying dithering, it is recommended to use the following settings:
 
@@ -54,7 +56,7 @@ For more visually pleasing results before applying dithering, it is recommended 
 
 2. Dithering a Video with Multiple Threads:
   ```
-  python dither.py -i input_video.mp4 -o output_video.mp4 -m 4x4 -t 4 -c 1.5 -s 1.6 -d 2
+  python dither.py -i input_video.mp4 -o output_video.avi -m 4x4 -t 4 -c 1.5 -s 1.6 -d 2
   ```
 <p align="center">
   <video src="https://github.com/user-attachments/assets/1d1abe14-625d-4bd7-87e6-00cb6b14da05" width="45%" controls></video>
