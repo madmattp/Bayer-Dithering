@@ -191,7 +191,7 @@ def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale
             frames.append(dithered_image)
 
     gif_buffer = BytesIO()
-    frames[0].save(gif_buffer, format="GIF", save_all=True, append_images=frames[1:], loop=0, duration=durations, transparency=1)
+    frames[0].save(gif_buffer, format="GIF", save_all=True, append_images=frames[1:], loop=0, duration=durations)
     gif_buffer.seek(0)
     
     return gif_buffer
