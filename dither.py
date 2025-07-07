@@ -296,8 +296,8 @@ if __name__ == "__main__":
                             downscale_factor=args.downscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
-            output_file = args.output if args.output is not None else "dithered_video.mp4"
-            final_clip.write_videofile(output_file, codec="libx264")
+            output_file = args.output if args.output is not None else "dithered_video.avi"
+            final_clip.write_videofile(output_file, codec="rawvideo")
 
         else:
             raise ValueError
