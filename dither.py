@@ -71,6 +71,17 @@ def load_filters():
         return default_filters
     
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', '1', 'y'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', '0', 'n'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.description = "Applies a Bayer matrix dithering effect to images or videos."
@@ -83,6 +94,7 @@ def parse_arguments():
     parser.add_argument('-s', '--sharpness', metavar='FACTOR', type=float, default=1.6, help="adjusts the sharpness of the image.")
     parser.add_argument('-c', '--contrast', metavar='FACTOR', type=float, default=1.5, help='adjusts the contrast of the image.')
     parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=2, help='downscales the image by the given factor before applying the dithering.')
+    parser.add_argument('-u', '--upscale', metavar='BOOLEAN', type=str2bool, default=True, help='upscales the image back to its original size after dithering. This is useful for preserving the original dimensions of the Image.')
     parser.add_argument('-t', '--threads', metavar='INTEGER', type=int, default=1, help='specifies the number of threads to use for parallel processing.')
 
     args = parser.parse_args()
@@ -99,6 +111,12 @@ def downscale(image: Image, pot: int):
     height = image.height // pot
     downscaled_image = image.resize((width, height), Image.Resampling.NEAREST)
     return downscaled_image
+
+def upscale(image: Image, pot: int) -> Image:
+    width = image.width * pot
+    height = image.height * pot
+    upscaled_image = image.resize((width, height), Image.Resampling.NEAREST)
+    return upscaled_image
 
 def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
     grayscale_image = image.convert('L')
@@ -149,7 +167,7 @@ def is_image(file_path: Path):
     except (IOError, SyntaxError):
         return False
 
-def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
+def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool ,matrix: np.ndarray, chosen_filter: list = None):
     with Image.open(image_path) as image:
         enhancer = ImageEnhance.Contrast(image)
         image = enhancer.enhance(factor=contrast)
@@ -159,6 +177,9 @@ def image_processing(image_path: Path, contrast: float, sharpness: float, downsc
 
         if chosen_filter is not None:
             dithered_image = colored_filter(image=dithered_image, colors=chosen_filter)
+
+        if upscale_bool:
+            dithered_image = upscale(image=dithered_image, pot=downscale_factor)  
 
         return dithered_image
 
@@ -171,7 +192,7 @@ def is_gif(file_path: Path):
     except (IOError, SyntaxError):
         return False
     
-def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
+def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
     with Image.open(input_gif) as gif:
         durations = gif.info['duration']
         frames = []
@@ -187,6 +208,9 @@ def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale
 
             if chosen_filter is not None:
                 dithered_image = colored_filter(dithered_image, chosen_filter)
+
+            if upscale_bool:
+                dithered_image = upscale(image=dithered_image, pot=downscale_factor)
             
             frames.append(dithered_image)
 
@@ -207,7 +231,7 @@ def is_video(file_path: Path):
     finally:
         video.release()
 
-def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, matrix: np.ndarray, chosen_filter: list = None):
+def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
     def process_frame(frame_array, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter):
         image = Image.fromarray(frame_array)
 
@@ -217,6 +241,9 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
         downscaled_image = downscale(image=sharp_image, pot=downscale_pot)
         dithered_image = bayer_dithering(image=downscaled_image, bayer_matrix=bayer_matrix)
         dithered_image = colored_filter(dithered_image, chosen_filter)
+
+        if upscale_bool:
+            dithered_image = upscale(image=dithered_image, pot=downscale_factor)
 
         return np.array(dithered_image)
 
@@ -273,6 +300,7 @@ if __name__ == "__main__":
                             contrast=args.contrast,
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
+                            upscale_bool=args.upscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
             output_file = args.output if args.output is not None else "dithered_image.png"
@@ -283,6 +311,7 @@ if __name__ == "__main__":
                             contrast=args.contrast,
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
+                            upscale_bool=args.upscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
             with open("dithered_gif.gif", "wb") as f:
@@ -294,6 +323,7 @@ if __name__ == "__main__":
                             contrast=args.contrast,
                             sharpness=args.sharpness,
                             downscale_factor=args.downscale,
+                            upscale_bool=args.upscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
             output_file = args.output if args.output is not None else "dithered_video.avi"
