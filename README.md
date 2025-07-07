@@ -33,6 +33,7 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 - ```-s, --sharpness```: Adjusts the sharpness (default: 1.6).
 - ```-c, --contrast```: Adjusts the contrast (default: 1.5).
 - ```-d, --downscale```: Downscales the image by a factor before dithering (default: 2).
+- ```-u, --upscale```: Upscales the image back to its original size after dithering (default: True). Set -u False to disable.
 - ```-t, --threads```: Specifies the number of threads for processing (default: 1).
 
 ⚠️ Note: When processing videos, the output format must be .avi to ensure compatibility with the rawvideo codec used for lossless output. Other formats (e.g., .mp4) may fail to play correctly in common players due to unsupported encoding profiles.
@@ -47,7 +48,7 @@ For more visually pleasing results before applying dithering, it is recommended 
 ### Examples:
 1. Dithering an Image with Recommended Settings:
   ```
-  python dither.py -i input_image.png -o output_image.png -m 4x4 -c 1.5 -s 1.6 -d 2
+  python dither.py -i input_image.png -o output_image.png -m 4x4 -c 1.5 -s 1.6 -d 6
   ```
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2f4092bf-98b6-44d5-91af-441000b3979f" alt="Silly Cat" width="45%">
