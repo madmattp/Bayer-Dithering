@@ -3,6 +3,7 @@
 from PIL import Image, ImageEnhance, ImageSequence
 import time
 from multiprocessing import Process, Manager
+from threading import Thread
 from moviepy.editor import VideoFileClip, ImageSequenceClip
 import numpy as np
 import argparse
@@ -11,6 +12,7 @@ import sys
 import cv2
 from pathlib import Path
 from io import BytesIO
+import os
 
 # PRECOMPUTED BAYER's MATRICES
 bayer_matrix_2x2 = np.array([
@@ -271,7 +273,10 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
         subclip = video.subclip(start, end)
         frames = [frame for frame in subclip.iter_frames()]
 
-        proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
+        if os.name == "posix":
+            proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
+        else:
+            proc = Thread(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
         procs.append(proc)
         proc.start()
 
