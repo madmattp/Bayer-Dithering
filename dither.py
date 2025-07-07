@@ -275,7 +275,7 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
 
         if os.name == "posix":
             proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
-        else:
+        elif os.name == "nt":
             proc = Thread(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
         procs.append(proc)
         proc.start()
