@@ -2,7 +2,7 @@
 
 from PIL import Image, ImageEnhance, ImageSequence
 import time
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, Value
 from threading import Thread
 from moviepy.editor import VideoFileClip, ImageSequenceClip
 import numpy as np
@@ -274,23 +274,41 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
 
         return np.array(dithered_image)
 
-    def process_clip(index, all_processed_frames, frames, contrast, sharpness, downscale_pot, chosen_filter, bayer_matrix):
+    def process_clip(index, all_processed_frames, frames, contrast, sharpness, downscale_pot, chosen_filter, bayer_matrix, frame_counter):
         processed_frames = []
         for frame in frames:
             processed_frame = process_frame(frame, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter)
             processed_frames.append(processed_frame)
+            with frame_counter.get_lock():
+                frame_counter.value += 1  # incrementa a cada frame processado
 
         all_processed_frames[index] = processed_frames
+
+    def loading_bar(total_frames, frame_counter):
+        pbar = tqdm(total=total_frames, desc="Ditherer - Processing frames", unit="frame", dynamic_ncols=True, leave=True)
+        while True:
+            if pbar.n >= total_frames:
+                break
+            pbar.n = frame_counter.value
+            pbar.refresh()
+            time.sleep(0.1)
+        pbar.close()
+        print("Ditherer - Done!")
 
     video = VideoFileClip(video_path)
     audio_clip = video.audio
     fps = video.fps
+    qtd_frames = video.reader.nframes
 
     duration_per_process = video.duration / threads
     manager = Manager()
     all_processed_frames = manager.dict()
+    frame_counter = Value('i', 0)
     procs = []
 
+    progress_thread = Thread(target=loading_bar, args=(qtd_frames, frame_counter))
+    progress_thread.start()
+    
     for i in range(threads):
         start = i * duration_per_process
         end = min((i + 1) * duration_per_process, video.duration)
@@ -299,14 +317,16 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
         frames = [frame for frame in subclip.iter_frames()]
 
         if os.name == "posix": # Linux or macOS
-            proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
+            proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix, frame_counter))
         elif os.name == "nt": # Windows
-            proc = Thread(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
+            proc = Thread(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix, frame_counter))
         procs.append(proc)
         proc.start()
 
     for proc in procs:
         proc.join()
+
+    progress_thread.join()
 
     all_processed_frames = dict(sorted(all_processed_frames.items()))
     all_processed_frames = [frame for sublist in all_processed_frames.values() for frame in sublist]
@@ -360,8 +380,8 @@ if __name__ == "__main__":
                             upscale_bool=args.upscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
-            output_file = args.output if args.output is not None else "dithered_video.avi"
-            final_clip.write_videofile(output_file, codec="rawvideo", threads=args.threads, logger=None)
+            output_file = f"{args.output}.avi" if args.output is not None else "dithered_video.avi"
+            final_clip.write_videofile(output_file, codec="rawvideo", threads=args.threads)
 
         else:
             raise ValueError
