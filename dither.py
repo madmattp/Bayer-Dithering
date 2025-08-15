@@ -13,6 +13,8 @@ import cv2
 from pathlib import Path
 from io import BytesIO
 import os
+from tqdm import tqdm
+from numba import njit
 
 # PRECOMPUTED BAYER's MATRICES
 # These matrices are used for thresholding in the dithering process.
@@ -122,26 +124,25 @@ def upscale(image: Image, pot: int) -> Image:
     upscaled_image = image.resize((width, height), Image.Resampling.NEAREST)
     return upscaled_image
 
+@njit
+def bayer_dither_array(img_array, bayer_matrix):
+    height, width = img_array.shape
+    matrix_size = bayer_matrix.shape[0]
+    for y in range(height):
+        for x in range(width):
+            threshold = bayer_matrix[y % matrix_size, x % matrix_size]
+            img_array[y, x] = 1 if img_array[y, x] > threshold else 0
+    return img_array
+
 def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
     """
     Applies Bayer matrix dithering to a grayscale image.
     Returns a black and white dithered image.
     """
-
     grayscale_image = image.convert('L')
 
     img_array = np.array(grayscale_image, dtype=np.float32) / 255.0
-    height, width = img_array.shape
-
-    for y in range(height):
-        for x in range(width):
-            threshold = bayer_matrix[y % len(bayer_matrix), x % len(bayer_matrix)]
-        
-            if round(img_array[y, x], 1) > threshold:
-                img_array[y, x] = 1
-            else:
-                img_array[y, x] = 0
-            
+    img_array = bayer_dither_array(img_array, bayer_matrix)
     dithered_image = Image.fromarray((img_array * 255).astype(np.uint8))
     return dithered_image
 
