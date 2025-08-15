@@ -360,7 +360,7 @@ if __name__ == "__main__":
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
             output_file = args.output if args.output is not None else "dithered_video.avi"
-            final_clip.write_videofile(output_file, codec="rawvideo")
+            final_clip.write_videofile(output_file, codec="rawvideo", threads=args.threads, logger=None)
 
         else:
             raise ValueError
