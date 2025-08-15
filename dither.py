@@ -15,6 +15,8 @@ from io import BytesIO
 import os
 
 # PRECOMPUTED BAYER's MATRICES
+# These matrices are used for thresholding in the dithering process.
+# The values are normalized to the range [0, 1].
 bayer_matrix_2x2 = np.array([
     [0, 2],
     [3, 1]
@@ -121,6 +123,11 @@ def upscale(image: Image, pot: int) -> Image:
     return upscaled_image
 
 def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
+    """
+    Applies Bayer matrix dithering to a grayscale image.
+    Returns a black and white dithered image.
+    """
+
     grayscale_image = image.convert('L')
 
     img_array = np.array(grayscale_image, dtype=np.float32) / 255.0
@@ -170,6 +177,13 @@ def is_image(file_path: Path):
         return False
 
 def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool ,matrix: np.ndarray, chosen_filter: list = None):
+    """
+    Full pipeline for processing a single image:
+    - Adjusts contrast and sharpness
+    - Downscales and dithers the image
+    - Optionally applies a color filter and upscales back
+    """
+
     with Image.open(image_path) as image:
         enhancer = ImageEnhance.Contrast(image)
         image = enhancer.enhance(factor=contrast)
@@ -195,6 +209,10 @@ def is_gif(file_path: Path):
         return False
     
 def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
+    """
+    Processes each frame of a GIF using the same pipeline as for images.
+    Returns a BytesIO buffer containing the processed GIF.
+    """
     with Image.open(input_gif) as gif:
         durations = gif.info['duration']
         frames = []
@@ -234,6 +252,12 @@ def is_video(file_path: Path):
         video.release()
 
 def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
+    """
+    Processes a video by splitting it into segments and processing frames in parallel.
+    Uses multiprocessing on Linux/macOS and threading on Windows.
+    Returns a MoviePy video clip with the processed frames and original audio.
+    """
+
     def process_frame(frame_array, contrast, sharpness, downscale_pot, bayer_matrix, chosen_filter):
         image = Image.fromarray(frame_array)
 
@@ -273,9 +297,9 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
         subclip = video.subclip(start, end)
         frames = [frame for frame in subclip.iter_frames()]
 
-        if os.name == "posix":
+        if os.name == "posix": # Linux or macOS
             proc = Process(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
-        elif os.name == "nt":
+        elif os.name == "nt": # Windows
             proc = Thread(target=process_clip, args=(i, all_processed_frames, frames, contrast, sharpness, downscale_factor, chosen_filter, matrix))
         procs.append(proc)
         proc.start()
@@ -291,6 +315,10 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
     return final_clip
 
 if __name__ == "__main__":
+    # Entry point: parses arguments, loads filters, selects the Bayer matrix,
+    # and dispatches processing based on file type (image, GIF, or video).
+    # Handles errors and prints execution time.
+    
     start_time = time.time()
 
     args = parse_arguments()
