@@ -108,12 +108,12 @@ def parse_arguments():
     return args
 
 
-def sharpen(image: Image, factor: float):
+def sharpen(image: Image, factor: float) -> Image:
     enhancer = ImageEnhance.Sharpness(image)
     sharp_image = enhancer.enhance(factor)
     return sharp_image
 
-def downscale(image: Image, pot: int):
+def downscale(image: Image, pot: int) -> Image:
     width = image.width // pot
     height = image.height // pot
     downscaled_image = image.resize((width, height), Image.Resampling.NEAREST)
@@ -126,7 +126,7 @@ def upscale(image: Image, pot: int) -> Image:
     return upscaled_image
 
 @njit
-def bayer_dither_array(img_array, bayer_matrix):
+def bayer_dither_array(img_array, bayer_matrix) -> np.ndarray:
     height, width = img_array.shape
     matrix_size = bayer_matrix.shape[0]
     for y in range(height):
@@ -135,7 +135,7 @@ def bayer_dither_array(img_array, bayer_matrix):
             img_array[y, x] = 1 if img_array[y, x] > threshold else 0
     return img_array
 
-def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
+def bayer_dithering(image: Image, bayer_matrix: np.ndarray) -> Image:
     """
     Applies Bayer matrix dithering to a grayscale image.
     Returns a black and white dithered image.
@@ -147,7 +147,7 @@ def bayer_dithering(image: Image, bayer_matrix: np.ndarray):
     dithered_image = Image.fromarray((img_array * 255).astype(np.uint8))
     return dithered_image
 
-def colored_filter(image: Image, colors: list = None):
+def colored_filter(image: Image, colors: list = None) -> Image:
     image = image.convert("RGB")
     if colors is None:
         return image
@@ -167,7 +167,7 @@ def colored_filter(image: Image, colors: list = None):
 
     return image
 
-def is_image(file_path: Path):
+def is_image(file_path: Path) -> bool:
     try:
         with Image.open(file_path) as img:
             img.verify()
@@ -178,7 +178,7 @@ def is_image(file_path: Path):
     except (IOError, SyntaxError):
         return False
 
-def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool ,matrix: np.ndarray, chosen_filter: list = None):
+def image_processing(image_path: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool ,matrix: np.ndarray, chosen_filter: list = None) -> Image:
     """
     Full pipeline for processing a single image:
     - Adjusts contrast and sharpness
@@ -201,7 +201,7 @@ def image_processing(image_path: Path, contrast: float, sharpness: float, downsc
 
         return dithered_image
 
-def is_gif(file_path: Path):
+def is_gif(file_path: Path) -> bool:
     try:
         with Image.open(file_path) as img:
             if img.format == 'GIF':
@@ -210,7 +210,7 @@ def is_gif(file_path: Path):
     except (IOError, SyntaxError):
         return False
     
-def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
+def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None) -> BytesIO:
     """
     Processes each frame of a GIF using the same pipeline as for images.
     Returns a BytesIO buffer containing the processed GIF.
@@ -242,7 +242,7 @@ def gif_processing(input_gif: Path, contrast: float, sharpness: float, downscale
     
     return gif_buffer
 
-def is_video(file_path: Path):
+def is_video(file_path: Path) -> bool:
     try:
         video = cv2.VideoCapture(file_path)
         if video.isOpened():
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     # and dispatches processing based on file type (image, GIF, or video).
     # Handles errors and prints execution time.
     
-    start_time = time.time()
+    start_time: float = time.time()
 
     args = parse_arguments()
 
@@ -412,8 +412,8 @@ if __name__ == "__main__":
         print(f"[ FileNotFoundError ] Input file {args.input} not found!")
         sys.exit(1)
 
-    end_time = time.time() 
-    execution_time = end_time - start_time
+    end_time: float = time.time() 
+    execution_time: float = end_time - start_time
     
     if not args.quiet:
         print(f"[ Bayer Dithering ] Processing time: {execution_time:.4f} seconds")
