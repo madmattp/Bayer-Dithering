@@ -102,6 +102,7 @@ def parse_arguments():
     parser.add_argument('-d', '--downscale', metavar='FACTOR', type=int, default=2, help='downscales the image by the given factor before applying the dithering.')
     parser.add_argument('-u', '--upscale', metavar='BOOLEAN', type=str2bool, default=True, help='upscales the image back to its original size after dithering. This is useful for preserving the original dimensions of the Image.')
     parser.add_argument('-t', '--threads', metavar='INTEGER', type=int, default=1, help='specifies the number of threads to use for parallel processing.')
+    parser.add_argument('-q', '--quiet', action='store_true', help='runs the script in quiet mode, suppressing progress bars and other output messages.')
 
     args = parser.parse_args()
     return args
@@ -252,7 +253,7 @@ def is_video(file_path: Path):
     finally:
         video.release()
 
-def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None):
+def video_processing(video_path: Path, threads: int, contrast: float, sharpness:float, downscale_factor: int, upscale_bool: bool, matrix: np.ndarray, chosen_filter: list = None, quiet: bool = False):
     """
     Processes a video by splitting it into segments and processing frames in parallel.
     Uses multiprocessing on Linux/macOS and threading on Windows.
@@ -307,7 +308,8 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
     procs = []
 
     progress_thread = Thread(target=loading_bar, args=(qtd_frames, frame_counter))
-    progress_thread.start()
+    if not quiet:
+        progress_thread.start()
     
     for i in range(threads):
         start = i * duration_per_process
@@ -326,7 +328,8 @@ def video_processing(video_path: Path, threads: int, contrast: float, sharpness:
     for proc in procs:
         proc.join()
 
-    progress_thread.join()
+    if not quiet:
+        progress_thread.join()
 
     all_processed_frames = dict(sorted(all_processed_frames.items()))
     all_processed_frames = [frame for sublist in all_processed_frames.values() for frame in sublist]
@@ -359,6 +362,8 @@ if __name__ == "__main__":
                             chosen_filter=filter_chosen)
             output_file = args.output if args.output is not None else "dithered_image.png"
             dithered_image.save(output_file)
+            if not args.quiet:
+                print(f"[ Bayer Dithering ] Output saved to: {output_file}") 
 
         elif is_gif(file_path=args.input):
             gif_buffer = gif_processing(input_gif=args.input,
@@ -368,8 +373,12 @@ if __name__ == "__main__":
                             upscale_bool=args.upscale,
                             matrix=bayer_matrix,
                             chosen_filter=filter_chosen)
-            with open("dithered_gif.gif", "wb") as f:
+            output_file = args.output if args.output is not None else "dithered_gif.gif"
+            with open(f"{output_file}", "wb") as f:
                 f.write(gif_buffer.getvalue())
+            
+            if not args.quiet:
+                print(f"[ Bayer Dithering ] Output saved to: {output_file}")
 
         elif is_video(file_path=args.input):
             final_clip = video_processing(video_path=args.input,
@@ -379,9 +388,12 @@ if __name__ == "__main__":
                             downscale_factor=args.downscale,
                             upscale_bool=args.upscale,
                             matrix=bayer_matrix,
-                            chosen_filter=filter_chosen)
+                            chosen_filter=filter_chosen,
+                            quiet=args.quiet)
             output_file = f"{args.output}.avi" if args.output is not None else "dithered_video.avi"
-            final_clip.write_videofile(output_file, codec="rawvideo", threads=args.threads)
+            logger = 'bar' if not args.quiet else None
+            verbose = not args.quiet
+            final_clip.write_videofile(output_file, codec="rawvideo", threads=args.threads, logger=logger, verbose=verbose)
 
         else:
             raise ValueError
@@ -401,5 +413,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     end_time = time.time() 
-    execution_time = end_time - start_time  
-    print(f"Processing time: {execution_time:.4f} seconds")
+    execution_time = end_time - start_time
+    
+    if not args.quiet:
+        print(f"[ Bayer Dithering ] Processing time: {execution_time:.4f} seconds")
