@@ -1,4 +1,4 @@
-# Ex: Filter_name = [[RGB], [RGB]]
+# Ex: Filter_name = [[R, G, B], [R, G, B]]
 
 Orange = [[252, 176, 32], [10, 6, 3]]
 Capuccino = [[200, 185, 150], [61, 49, 40]]
