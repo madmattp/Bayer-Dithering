@@ -35,6 +35,7 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 - ```-d, --downscale```: Downscales the image by a factor before dithering (default: 2).
 - ```-u, --upscale```: Upscales the image back to its original size after dithering (default: True). Set -u False to disable.
 - ```-t, --threads```: Specifies the number of threads for processing (default: 1).
+- ```-q, --quiet ```: Runs the script in quiet mode, suppressing progress bars and other output messages.
 
 ⚠️ Note: When processing videos, the output format must be .avi to ensure compatibility with the rawvideo codec used for lossless output. Other formats (e.g., .mp4) may fail to play correctly in common players due to unsupported encoding profiles.
 
