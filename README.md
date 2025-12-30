@@ -10,7 +10,7 @@ This Python script applies a Bayer matrix dithering to images, gifs or videos. I
 
 ## Features
 - Dithering for images and videos: Applies Bayer matrix dithering to PNG, JPG, GIF, and MP4 files.
-- Customizable filters: Configurable through the filters.toml file.
+- Customizable filters: Configurable through the [filters.toml](https://github.com/madmattp/Bayer-Dithering/blob/main/filters.toml) file.
 - Multi-threading Support: Process large files faster with parallel processing.
 - Support for downscaling and sharpening: Image manipulation options before dithering.
 
@@ -44,12 +44,12 @@ For more visually pleasing results before applying dithering, it is recommended 
 
 - **Contrast**: **1.5**
 - **Sharpness**: **1.6**
-- **Downscaling**: **>2**
+- **Downscaling**: **>=2**
 
 ### Examples:
 1. Dithering an Image with Recommended Settings:
   ```
-  python dither.py -i input_image.png -o output_image.png -m 4x4 -c 1.5 -s 1.6 -d 6
+  python dither.py -i input_image.png -o output_image.png -m 4x4 -d 6
   ```
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2f4092bf-98b6-44d5-91af-441000b3979f" alt="Silly Cat" width="45%">
