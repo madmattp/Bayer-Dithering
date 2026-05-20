@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "BayerDithering"
+version = "0.3.0"
+authors = [
+    {name = "madmattp", email = "mpqfreitas@gmail.com"}
+]
+description = "A high-performance, GPU-accelerated Bayer matrix dithering library and CLI for images, GIFs, and videos."
+readme = "README.md"
+license = { file = "LICENSE" }
+dependencies = [
+    "numpy>=2.4.0",
+    "opencv-python>=4.10.0.84",
+    "taichi>=1.7.0",
+    "imageio>=2.37.0",
+    "filetype>=1.2.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["BayerDithering*"]
+exclude = ["tests*", "images*"]
+
+[project.scripts]
+dither = "BayerDithering.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/madmattp/Bayer-Dithering"
+Bug-Tracker = "https://github.com/madmattp/Bayer-Dithering/issues"
