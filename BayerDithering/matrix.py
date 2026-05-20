@@ -46,7 +46,6 @@ def generate_bayer_matrix(order: int) -> NDArray[np.float32]:
     
     for _ in range(order - 1):
         # M_2n = [[4*Mn, 4*Mn + 2], [4*Mn + 3, 4*Mn + 1]]
-        n = matrix.shape[0]
         top = np.hstack([4 * matrix, 4 * matrix + 2])
         bot = np.hstack([4 * matrix + 3, 4 * matrix + 1])
         matrix = np.vstack([top, bot])

@@ -336,7 +336,7 @@ class BayerDither():
         fd, temp_path = tempfile.mkstemp(suffix=".gif")
         os.close(fd)
         
-        self.logger.debug(f"Writing GIF frames to temporary file...")
+        self.logger.debug("Writing GIF frames to temporary file...")
         with imageio.get_writer(temp_path, format='GIF', duration=duration, loop=loop) as writer:
             for f in processed_frames:
                 writer.append_data(f)
