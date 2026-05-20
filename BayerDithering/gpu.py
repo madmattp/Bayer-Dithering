@@ -4,7 +4,6 @@ import os
 import cv2
 import numpy as np
 from numpy.typing import NDArray
-import taichi as ti
 from .core import MediaProcessor, DitherConfig
 
 
