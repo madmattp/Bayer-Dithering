@@ -70,7 +70,7 @@ For more visually pleasing retro results, it is recommended to use the following
 
 #### 1. Dithering an Image:
   ```bash
-  dither -i media/cat.jpg -m 4x4 -d 6
+  dither -i media/cat.jpg -d 6
   ```
 
   <p align="center">
