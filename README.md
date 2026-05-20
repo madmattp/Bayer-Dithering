@@ -4,9 +4,9 @@
 
 # Bayer Dithering
 
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fmadmattp%2FBayer-Dithering%2Fmain%2Fpyproject.toml)
 ![License](https://img.shields.io/github/license/madmattp/Bayer-Dithering)
 ![GitHub Repo stars](https://img.shields.io/github/stars/madmattp/Bayer-Dithering)
-
 
 A high-performance, GPU-accelerated Python library and Command-Line Interface (CLI) that applies Bayer matrix dithering to images, GIFs, and videos. 
 
