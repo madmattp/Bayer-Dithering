@@ -5,6 +5,7 @@
 # Bayer Dithering
 
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fmadmattp%2FBayer-Dithering%2Fmain%2Fpyproject.toml)
+![PyPI - Version](https://img.shields.io/pypi/v/BayerDithering)
 ![License](https://img.shields.io/github/license/madmattp/Bayer-Dithering)
 ![GitHub Repo stars](https://img.shields.io/github/stars/madmattp/Bayer-Dithering)
 
@@ -21,10 +22,18 @@ It offers a variety of customizable options such as matrix size, custom color fi
 
 ## Installation
 
+### Option 1: Install via PyPI (Recommended)
+The easiest way to install the library and the global CLI is directly from the Python Package Index:
+
+```bash
+pip install BayerDithering
+```
+
+### Option 2: Build from Source
 1. Clone the repository:
    ```bash
    git clone https://github.com/madmattp/Bayer-Dithering.git
-   cd Bayer-Dithering
+   cd BayerDithering
    ```
 2. Install the package and its dependencies:
    ```bash
