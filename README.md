@@ -80,7 +80,7 @@ For more visually pleasing retro results, it is recommended to use the following
 
 #### 2. Dithering a Video with a Color Filter (**GPU Accelerated**):
   ```bash
-  dither -i media/huh.mp4 -a gpu -m 4x4 -c 1.5 -s 1.6 -f Cyan
+  dither -i media/huh.mp4 -a gpu -m 4x4 -c 1.5 -s 1.6 -f Cyan -u False -d 4
   ```
 
   <p align="center">
