@@ -134,7 +134,7 @@ else:
                 src_x = x * downscale
                 src_y = y * downscale
 
-                # Sharpness via Convolução 3x3 (lendo os vizinhos)
+                # Sharpness via 3x3 Convolution (reading neighboring pixels)
                 x_left = ti.max(0, src_x - 1)
                 x_right = ti.min(src_w - 1, src_x + 1)
                 y_up = ti.max(0, src_y - 1)
@@ -146,13 +146,13 @@ else:
                 left = self.get_gray(frames, n, src_y, x_left)
                 right = self.get_gray(frames, n, src_y, x_right)
 
-                # Aplica matriz laplaciana para criar a nitidez nas bordas
+                # Apply Laplacian matrix to enhance edge sharpness
                 gray = center + sharpness * (4.0 * center - up - down - left - right)
 
                 # Contrast
                 gray = (gray - mean_val) * contrast + mean_val
 
-                # Clamp (limita os resultados matemáticos às cores visíveis de 0 a 255)
+                # Clamp (constrain mathematical results to the visible color range of 0 to 255)
                 gray = ti.max(0.0, ti.min(255.0, gray))
 
                 # Bayer Dither
