@@ -25,7 +25,7 @@ gpu = ["taichi>=1.7.0"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["BayerDithering*"]
-exclude = ["tests*", "images*"]
+exclude = ["tests*", "media*"]
 
 [project.scripts]
 dither = "BayerDithering.cli:main"
