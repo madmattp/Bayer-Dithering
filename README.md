@@ -9,47 +9,65 @@
 ![License](https://img.shields.io/github/license/madmattp/Bayer-Dithering)
 ![GitHub Repo stars](https://img.shields.io/github/stars/madmattp/Bayer-Dithering)
 
-A high-performance, GPU-accelerated Python library and Command-Line Interface (CLI) that applies Bayer matrix dithering to images, GIFs, and videos. 
+A high-performance, GPU-accelerated Python library and Command-Line Interface (CLI) that applies Bayer matrix dithering to images, GIFs, and videos.
 
 It offers a variety of customizable options such as matrix size, custom color filters, sharpness, contrast, and downscaling, powered by parallel processing for blazing-fast media generation.
 
 ## Features
+
 - **Hardware Acceleration:** Choose between CPU or GPU (`taichi` backend) for massive performance gains, especially on videos.
 - **Universal Media Support:** Seamlessly process PNG, JPG, GIF, and MP4 files with automatic format detection.
 - **Global CLI:** Install once and use the `dither` command from anywhere in your terminal.
 - **Customizable Filters:** Apply beautiful retro color palettes easily.
 - **Pre-Processing Pipeline:** Built-in options for downscaling, contrast adjustment, and sharpening before the dithering effect is applied.
 
+## Prerequisites
+
+- **Python:** Version `>= 3.13` (Support for `3.14` is currently pending `taichi` backend C-API compiled wheels, but the CPU pipeline works universally).
+- **Hardware:** A dedicated GPU is highly recommended for video and GIF processing, though a CPU fallback is natively provided.
+
 ## Installation
 
 ### Option 1: Install via PyPI (Recommended)
+
 The easiest way to install the library and the global CLI is directly from the Python Package Index:
 
 ```bash
 pip install BayerDithering
 ```
 
+To enable GPU Hardware Acceleration (Recommended for Videos), install the package with the optional `taichi` backend dependency:
+
+```bash
+pip install "BayerDithering[gpu]"
+```
+
 ### Option 2: Build from Source
+
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/madmattp/Bayer-Dithering.git
    cd BayerDithering
    ```
+
 2. Install the package and its dependencies:
+
    ```bash
    pip install -e .
    ```
-   *(This will install the required libraries and link the `dither` command to your system).*
+
+   *(This will install the required libraries and link the `dither` command to your system).* 
 
 ## Usage
 
 Once installed, you can use the `dither` command directly in your terminal.
 
-### Command Line Options:
+### Command Line Options
 
 - `-i, --input`: **(Required)** Specifies the input file (image, gif, or video).
 
-- `-a, --arch`: Processing hardware. Options: `cpu`, `gpu` (default: `cpu`).
+- `-a, --arch`: Processing hardware. Options: `cpu`, `gpu` (default: `cpu`). *Note: If `gpu` is requested but the optional backend is not installed, the CLI will automatically fallback to `cpu` processing safely.*
 
 - `-m, --matrix`: Selects the Bayer matrix size. Options: `2x2`, `4x4`, `8x8` (default: `4x4`).
 
@@ -68,7 +86,9 @@ Once installed, you can use the `dither` command directly in your terminal.
 - `-q, --quiet`: Runs the script in quiet mode, suppressing terminal output.
 
 ### Recommended Settings
+
 For more visually pleasing retro results, it is recommended to use the following settings:
+
 - **Contrast: 1.5**
 
 - **Sharpness: 1.6**
@@ -77,7 +97,8 @@ For more visually pleasing retro results, it is recommended to use the following
 
 ### Examples
 
-#### 1. Dithering an Image:
+#### 1. Dithering an Image
+
   ```bash
   dither -i media/cat.jpg -d 6
   ```
@@ -87,7 +108,8 @@ For more visually pleasing retro results, it is recommended to use the following
     <img src="media/cat_dithered.png" alt="Dithered Image" width="45%">
   </p>
 
-#### 2. Dithering a Video with a Color Filter (**GPU Accelerated**):
+#### 2. Dithering a Video with a Color Filter (**GPU Accelerated**)
+
   ```bash
   dither -i media/huh.mp4 -a gpu -m 4x4 -c 1.5 -s 1.6 -f Cyan -u False -d 4
   ```
@@ -98,9 +120,11 @@ For more visually pleasing retro results, it is recommended to use the following
   </p>
 
 ## Python API Usage
+
 You can also import `BayerDithering` directly into your own Python scripts to build custom graphics pipelines or integrate the effect into other applications.
 
 ### 1. Basic Image Processing (NumPy / OpenCV)
+
 If you already have an image loaded as a NumPy array, you can process it directly:
 
 ```python
@@ -130,6 +154,7 @@ cv2.imwrite("media/cat_dithered.png", dithered_image)
 ```
 
 ### 2. High-Performance Video Processing (GPU Accelerated)
+
 For processing videos, pass a `cv2.VideoCapture` object directly into the `apply` method. The pipeline leverages the `taichi` backend for parallel GPU frame processing and returns a `ProcessedVideo` context manager:
 
 ```python
@@ -162,6 +187,7 @@ video_capture.release()
 ```
 
 ### 3. Animated GIF Processing
+
 GIF processing relies on multi-frame arrays or lists of images. The `apply` method processes the frame sequence and returns a `ProcessedGIF` context manager to gracefully handle saving the output stream:
 
 ```python
@@ -191,6 +217,7 @@ with iio.get_reader("media/cat-shocked.gif") as gif_frames:
 ```
 
 ### 4. Loading Custom Filters Programmatically
+
 If you want to use the color palettes defined in your [`filters.toml`](/BayerDithering/filters.toml) dynamically inside a Python script:
 
 ```python
@@ -210,4 +237,5 @@ config = DitherConfig(
 ```
 
 ## Contributions
+
 Feel free to open issues or contribute via pull requests. Contributions are welcome!

@@ -4,21 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "BayerDithering"
-version = "0.3.0"
+version = "0.3.1"
 authors = [
     {name = "madmattp", email = "mpqfreitas@gmail.com"}
 ]
 description = "A high-performance, GPU-accelerated Bayer matrix dithering library and CLI for images, GIFs, and videos."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
-    "numpy>=2.4.0",
     "opencv-python>=4.10.0.84",
-    "taichi>=1.7.0",
+    "numpy>=2.4.0",
     "imageio>=2.37.0",
     "filetype>=1.2.0"
 ]
+
+[project.optional-dependencies]
+gpu = ["taichi>=1.7.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
