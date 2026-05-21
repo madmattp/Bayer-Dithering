@@ -3,6 +3,7 @@ import sys
 import os
 from BayerDithering import BayerDither, CPUProcessor, GPUProcessor, DitherConfig, matrices
 from BayerDithering.utils import ProcessedVideo, ProcessedGIF, load_filters
+from BayerDithering.gpu import TAICHI_AVAILABLE
 import cv2
 from pathlib import Path
 import filetype
@@ -73,10 +74,14 @@ def main():
         filter=filter_chosen
     )
 
+    processor = CPUProcessor(config)
     if args.arch == 'gpu':
-        processor = GPUProcessor(config)
-    else:
-        processor = CPUProcessor(config)
+        if TAICHI_AVAILABLE:
+            processor = GPUProcessor(config)
+        else:
+            print("Warning: GPU backend (Taichi) is unavailable.\n"
+                "Automatic fallback to CPU processing activated...\n"
+                "Tip: Install with 'pip install BayerDithering[gpu]' to enable hardware acceleration.\n")
 
     ditherer = BayerDither(processor=processor, verbose=not args.quiet)
 

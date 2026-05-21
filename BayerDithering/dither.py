@@ -9,14 +9,9 @@ import contextlib
 import logging
 import tempfile
 from .core import DitherConfig, MediaProcessor, MediaInput, MediaOutput
-from .gpu import GPUProcessor
+from .gpu import GPUProcessor, TAICHI_AVAILABLE
 from .cpu import CPUProcessor
 from .utils import ProcessedGIF, ProcessedVideo
-
-# Suppress Taichi's hardcoded Python prints during import and internal C++ engine logs
-os.environ["TI_LOG_LEVEL"] = "error"
-with contextlib.redirect_stdout(io.StringIO()):
-    import taichi as ti
 
 
 class BayerDither():
@@ -202,7 +197,7 @@ class BayerDither():
         self.logger.debug(f"Temporary file created at: {temp_path}")
 
         return ProcessedVideo(temp_path, self.logger.getEffectiveLevel())
-
+            
     def apply_to_video(self, video: cv2.VideoCapture) -> ProcessedVideo:
         """Applies the dithering process to an entire video stream.
 
@@ -228,7 +223,7 @@ class BayerDither():
 
         if self.device == "gpu":
             result = self._apply_to_video_gpu(video)
-        else: # cpu
+        else:
             result = self._apply_to_video_cpu(video)
 
         return result
@@ -392,11 +387,16 @@ class BayerDither():
         """
 
         devices = ["cpu"]
+
+        if not TAICHI_AVAILABLE:
+            return devices
+        
         
         # temporarily mute Taichi to prevent it from printing errors 
         # if the user doesn't have a GPU drivers installed.
         os.environ["TI_LOG_LEVEL"] = "ERROR"
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            import taichi as ti
             try:
                 # list of backend enums it can use on this machine
                 archs = ti.supported_archs()
