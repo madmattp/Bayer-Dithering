@@ -18,6 +18,18 @@ dependencies = [
     "imageio>=2.37.0",
     "filetype>=1.2.0"
 ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 [project.optional-dependencies]
 gpu = ["taichi>=1.7.0"]
@@ -32,5 +44,6 @@ dither = "BayerDithering.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/madmattp/Bayer-Dithering"
+Repository = "https://github.com/madmattp/Bayer-Dithering.git"
 Documentation = "https://madmattp.github.io/Bayer-Dithering/"
 Bug-Tracker = "https://github.com/madmattp/Bayer-Dithering/issues"
