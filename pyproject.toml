@@ -32,4 +32,5 @@ dither = "BayerDithering.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/madmattp/Bayer-Dithering"
+Documentation = "https://madmattp.github.io/Bayer-Dithering/"
 Bug-Tracker = "https://github.com/madmattp/Bayer-Dithering/issues"
