@@ -13,6 +13,12 @@ A high-performance, GPU-accelerated Python library and Command-Line Interface (C
 
 It offers a variety of customizable options such as matrix size, custom color filters, sharpness, contrast, and downscaling, powered by parallel processing for blazing-fast media generation.
 
+## Documentation and Showcase
+
+The complete documentation, API reference, and visual gallery are available online:
+
+**[Read the Official Documentation](https://madmattp.github.io/Bayer-Dithering/)**
+
 ## Features
 
 - **Hardware Acceleration:** Choose between CPU or GPU (`taichi` backend) for massive performance gains, especially on videos.
