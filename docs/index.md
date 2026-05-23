@@ -14,7 +14,7 @@ It offers a variety of customizable options such as matrix size, custom color fi
 
 ## Documentation Sections
 
-Welcome to the `BayerDithering` documentation! Get started by exploring the sections below:
+Get started by exploring the sections below:
 
 - **[Installation Guide](installation.md):** Learn how to install the library and configure the GPU backend.
 - **[Quickstart (API Usage) with Examples](quickstart.md):** Discover how to integrate `BayerDithering` into your Python scripts, process images programmatically, and easily customize contrast, sharpness, and color palettes.
