@@ -8,10 +8,17 @@ from .utils import ProcessedVideo, ProcessedGIF
 
 
 MediaInput: TypeAlias = Union[NDArray[np.uint8], cv2.VideoCapture, Any]
+"""Represents the accepted input formats for the dithering process. 
+Can be a raw NumPy image array, an OpenCV VideoCapture stream, or an imageio GIF reader."""
+
 MediaOutput: TypeAlias = Union[NDArray[np.uint8], ProcessedVideo, ProcessedGIF]
+"""Represents the possible outputs returned by the dithering orchestrator, depending on the input provided."""
 
 RGBColor: TypeAlias = tuple[int, int, int]
+"""A standard RGB color representation using a tuple of three integers (0-255)."""
+
 ColorFilter: TypeAlias = tuple[RGBColor, RGBColor]
+"""A duotone palette consisting of two `RGBColor` tuples: (light_color, dark_color)."""
 
 @dataclass
 class DitherConfig:

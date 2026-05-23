@@ -44,12 +44,32 @@ class CPUProcessor(MediaProcessor):
 
     @staticmethod
     def upscale(image: NDArray[np.uint8], target_size: tuple[int, int]) -> NDArray[np.uint8]:
-        """Resizes the image to a target size using nearest-neighbor interpolation."""
+        """Resizes the image to a target size using nearest-neighbor interpolation.
+        
+        Triggered when [DitherConfig.upscale][BayerDithering.core.DitherConfig] is set to True.
+
+        Args:
+            image (NDArray[np.uint8]): The processed, downscaled image.
+            target_size (tuple[int, int]): The desired (width, height) to restore.
+
+        Returns:
+            NDArray[np.uint8]: The upscaled image.
+        """
 
         return cv2.resize(image, target_size, interpolation=cv2.INTER_NEAREST)
 
     def downscale(self, image: NDArray[np.uint8]) -> NDArray[np.uint8]:
-        """Reduces the image resolution based on the configured downscale_factor."""
+        """Reduces the image resolution based on the configured downscale factor.
+        
+        This uses the value defined in [DitherConfig.downscale_factor][BayerDithering.core.DitherConfig] 
+        to divide the original dimensions, achieving a more pixelated retro look.
+
+        Args:
+            image (NDArray[np.uint8]): The original input image.
+
+        Returns:
+            NDArray[np.uint8]: The downscaled image.
+        """
 
         height, width = image.shape[:2]
 
@@ -59,7 +79,16 @@ class CPUProcessor(MediaProcessor):
         return cv2.resize(image, new_size, interpolation=cv2.INTER_NEAREST)
     
     def adjust_contrast(self, image: NDArray[np.uint8]) -> NDArray[np.uint8]:
-        """Adjusts the contrast of an image based on its mean luminance."""
+        """Adjusts the contrast of an image based on its mean luminance.
+        
+        The intensity of the adjustment is controlled by [DitherConfig.contrast][BayerDithering.core.DitherConfig].
+
+        Args:
+            image (NDArray[np.uint8]): A grayscale image array.
+
+        Returns:
+            NDArray[np.uint8]: The contrast-adjusted grayscale image.
+        """
 
         mean = np.mean(image)
         return np.clip(
@@ -68,13 +97,32 @@ class CPUProcessor(MediaProcessor):
         ).astype(np.uint8)
 
     def sharpen(self, image: NDArray[np.uint8]) -> NDArray[np.uint8]:
-        """Applies an unsharp mask filter to enhance edges."""
+        """Applies an unsharp mask filter to enhance edges.
+
+        The intensity of the sharpening is controlled by [DitherConfig.sharpness][BayerDithering.core.DitherConfig].
+
+        Args:
+            image (NDArray[np.uint8]): A grayscale image array.
+
+        Returns:
+            NDArray[np.uint8]: The sharpened grayscale image.
+        """
 
         blurred = cv2.GaussianBlur(image, (0, 0), sigmaX=1.0)
         return cv2.addWeighted(image, 1 + self.config.sharpness, blurred, -self.config.sharpness, 0)
 
     def bayer_dither_array(self, image_array: NDArray[np.uint8]) -> NDArray[np.uint8]:
-        """Applies the Bayer thresholding to a grayscale image array."""
+        """Applies the Bayer thresholding to a grayscale image array.
+        
+        It utilizes the pre-computed matrix defined in [DitherConfig.b_matrix][BayerDithering.core.DitherConfig], 
+        tiling it across the entire image to determine pixel activation.
+
+        Args:
+            image_array (NDArray[np.uint8]): The pre-processed grayscale image.
+
+        Returns:
+            NDArray[np.uint8]: The binarized image (containing only 0 or 255 values).
+        """
 
         matrix = self.bayer_matrix_u8
 
@@ -86,7 +134,20 @@ class CPUProcessor(MediaProcessor):
         return (image_array > tiled_matrix).astype(np.uint8) * 255
 
     def process_frame(self, image: NDArray[np.uint8]) -> NDArray[np.uint8]:
-        """Executes the full CPU processing pipeline on a single frame."""
+        """Executes the full CPU processing pipeline on a single frame.
+        
+        The pipeline order is: Grayscale Conversion -> Contrast -> Sharpening -> 
+        Downscaling -> Bayer Dithering -> Color Filtering (Optional) -> Upscaling (Optional).
+
+        Args:
+            image (NDArray[np.uint8]): The raw input image in BGR format.
+
+        Returns:
+            NDArray[np.uint8]: The final processed and dithered image.
+            
+        Raises:
+            ValueError: If the provided input image is None.
+        """
 
         if image is None:
             raise ValueError("Invalid input image provided.")

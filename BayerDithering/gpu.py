@@ -81,8 +81,19 @@ else:
             self.out_frames = ti.ndarray(dtype=ti.u8, shape=(batch_size, h1, w1, 3))
 
         @ti.func
-        def get_gray(self, frames: ti.template(), n: ti.i32, y: ti.i32, x: ti.i32) -> ti.f32:
-            """Taichi sub-function to extract and convert a specific BGR pixel to grayscale luminance."""
+        def get_gray(self, frames: ti.template(), n: ti.i32, y: ti.i32, x: ti.i32) -> ti.f32: # type: ignore
+            """Taichi sub-function to extract and convert a specific BGR pixel to grayscale luminance.
+            
+            Args:
+                frames (ti.template()): The Taichi field or ndarray containing the image batch.
+                n (ti.i32): The index of the frame within the batch.
+                y (ti.i32): The vertical coordinate (row) of the pixel.
+                x (ti.i32): The horizontal coordinate (column) of the pixel.
+
+            Returns:
+                ti.f32: The calculated grayscale luminance value (0.0 to 255.0).
+            
+            """
 
             b = ti.cast(frames[n, y, x, 0], ti.f32)
             g = ti.cast(frames[n, y, x, 1], ti.f32)
@@ -92,12 +103,18 @@ else:
         @ti.kernel
         def compute_batch_mean(
             self,
-            frames: ti.types.ndarray(dtype=ti.u8, ndim=4),
+            frames: ti.types.ndarray(dtype=ti.u8, ndim=4), # type: ignore
             batch_len: ti.i32,
             src_h: ti.i32,
             src_w: ti.i32
         ) -> ti.f32:
             """Parallel reduction kernel to compute the mean luminance of an entire video batch.
+
+            Args:
+                frames (ti.types.ndarray(dtype=ti.u8, ndim=4)): The batch of input frames.
+                batch_len (ti.i32): The number of frames currently in the batch.
+                src_h (ti.i32): The height of the source frames.
+                src_w (ti.i32): The width of the source frames.
 
             Returns:
                 ti.f32: The overall mean grayscale value of the batch.
@@ -113,8 +130,8 @@ else:
         @ti.kernel
         def process_video_batch_kernel(
             self,
-            frames: ti.types.ndarray(dtype=ti.u8, ndim=4),
-            out_frames: ti.types.ndarray(dtype=ti.u8, ndim=4),
+            frames: ti.types.ndarray(dtype=ti.u8, ndim=4), # type: ignore
+            out_frames: ti.types.ndarray(dtype=ti.u8, ndim=4), # type: ignore
             batch_len: ti.i32,
             src_h: ti.i32,
             src_w: ti.i32,
@@ -128,7 +145,28 @@ else:
             r0: ti.u8, g0: ti.u8, b0: ti.u8,
             r1: ti.u8, g1: ti.u8, b1: ti.u8
         ):
-            """Core GPU kernel that applies unsharp masking, contrast adjustment, and Bayer dithering to a batch of frames."""
+            """Core GPU kernel that applies unsharp masking, contrast adjustment, and Bayer dithering to a batch of frames.
+
+            Args:
+                frames (ti.types.ndarray(dtype=ti.u8, ndim=4)): The input batch of frames in BGR format.
+                out_frames (ti.types.ndarray(dtype=ti.u8, ndim=4)): The output buffer where processed frames are written.
+                batch_len (ti.i32): The number of frames currently in the batch.
+                src_h (ti.i32): The original height of the source frames.
+                src_w (ti.i32): The original width of the source frames.
+                out_h (ti.i32): The target height of the output frames (after downscaling).
+                out_w (ti.i32): The target width of the output frames (after downscaling).
+                downscale (ti.i32): The factor by which the image is scaled down.
+                contrast (ti.f32): The contrast multiplier to apply.
+                mean_val (ti.f32): The mean luminance of the batch used as a pivot for contrast adjustment.
+                sharpness (ti.f32): The intensity of the unsharp mask filter.
+                use_filter (ti.i32): Flag indicating whether to apply a custom color palette (1 for True, 0 for False).
+                r0 (ti.u8): Red channel of the dark color palette.
+                g0 (ti.u8): Green channel of the dark color palette.
+                b0 (ti.u8): Blue channel of the dark color palette.
+                r1 (ti.u8): Red channel of the light color palette.
+                g1 (ti.u8): Green channel of the light color palette.
+                b1 (ti.u8): Blue channel of the light color palette.
+            """
 
             for n, y, x in ti.ndrange(batch_len, out_h, out_w):
                 src_x = x * downscale

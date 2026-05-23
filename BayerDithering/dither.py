@@ -134,12 +134,12 @@ class BayerDither():
         downscaled_w = max(1, width // self.config.downscale_factor)
         downscaled_h = max(1, height // self.config.downscale_factor)
 
-        writer_width = width if self.config.upscale else downscaled_w
-        writer_height = height if self.config.upscale else downscaled_h
+        writer_width: int = width if self.config.upscale else downscaled_w
+        writer_height: int = height if self.config.upscale else downscaled_h
 
         out, temp_path = self._create_writer(writer_width, writer_height, fps)
 
-        batch_size = 128
+        batch_size: int = 128
         frame_counter: int = 0
         batch: list[NDArray[np.uint8]] = []
         
@@ -271,7 +271,7 @@ class BayerDither():
         
         return result
 
-    def apply_to_gif(self, gif_reader) -> ProcessedGIF:
+    def apply_to_gif(self, gif_reader: imageio.Reader) -> ProcessedGIF:
         """Applies the dithering process to an animated GIF stream.
 
         Args:

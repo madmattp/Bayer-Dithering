@@ -30,6 +30,14 @@ matrices = {
     '4x4': bayer_matrix_4x4,
     '8x8': bayer_matrix_8x8
 }
+"""A dictionary containing pre-computed, normalized Bayer matrices for quick access.
+
+Available keys:
+- `'2x2'`
+- `'4x4'`
+- `'8x8'`
+"""
+
 
 def generate_bayer_matrix(order: int) -> NDArray[np.float32]:
     """Generates a Bayer matrix of size (2^order x 2^order).
