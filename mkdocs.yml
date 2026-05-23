@@ -1,0 +1,53 @@
+site_name: BayerDithering
+site_description: A high-performance, GPU-accelerated Bayer matrix dithering library and CLI.
+site_author: madmattp
+repo_url: https://github.com/madmattp/Bayer-Dithering
+repo_name: madmattp/Bayer-Dithering
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: installation.md
+    - API Quickstart: quickstart.md
+    - CLI Usage: cli.md
+  - API Reference: api.md
+  - Gallery & Examples: examples.md
+
+markdown_extensions:
+  - pymdownx.superfences
+  - attr_list
+
+plugins:
+  - search
+  - mkdocstrings:
+        handlers:
+          python:
+            options:
+              show_root_heading: true
+              show_signature_annotations: true
+              heading_level: 3
+              
+              
