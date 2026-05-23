@@ -271,7 +271,7 @@ class BayerDither():
         
         return result
 
-    def apply_to_gif(self, gif_reader: imageio.Reader) -> ProcessedGIF:
+    def apply_to_gif(self, gif_reader: imageio.v2.LegacyReader) -> ProcessedGIF:
         """Applies the dithering process to an animated GIF stream.
 
         Args:
